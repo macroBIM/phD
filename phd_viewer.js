@@ -3,12 +3,12 @@
     · 서버의 index_phd.html 은 이 파일 하나만 불러온다. 목차·본문·스타일은 모두 저장소가 갖는다.
       → 논문을 고치거나 레이아웃을 바꿔도 서버 파일은 그대로 둔다.
     · 읽는 순서: toc.json → 각 장의 .md 를 병렬로 → marked 로 조판 → KaTeX 로 수식.
-    · 브랜치 미리보기: index_phd.html?br=<branch> — 기본값 main.
+    · 브랜치: ?br=<branch> > window.PHD_BRANCH(부트스트랩이 실제로 찾아낸 것) > main.
       (raw 는 text/plain + nosniff 라 <script src>/<link> 가 막힌다. 그래서 전부 fetch 후 주입한다.)
 */
 (function () {
   var params  = new URLSearchParams(location.search);
-  var BRANCH  = params.get('br') || 'main';
+  var BRANCH  = params.get('br') || window.PHD_BRANCH || 'main';   // 부르는 쪽이 정한 브랜치를 따른다
   var RAW     = 'https://raw.githubusercontent.com/macroBIM/phD/' + BRANCH + '/';
   var BUST    = '?v=' + Date.now();
   var CDN     = 'https://cdnjs.cloudflare.com/ajax/libs/';
