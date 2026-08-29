@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>논문 — macroBIM</title>
+<style>html,body{margin:0;background:#f6f7f9;}</style>
+</head>
+<body>
+
+<div id="phd-root">
+  <p style="font-family:system-ui,sans-serif;color:#8a9098;padding:60px;text-align:center;">논문을 불러오는 중…</p>
+</div>
+
+<script>
+(function () {
+  /* 원고·뷰어·스타일은 모두 macroBIM/phD 저장소에 있다. 이 파일은 뷰어를 불러오기만 한다.
+     → 논문을 고치든 화면을 바꾸든 이 파일은 다시 건드리지 않는다.
+     main 에 아직 없으면 작업 브랜치로 넘어간다. ?br=<branch> 로 특정 브랜치를 볼 수 있다. */
+  var REPO = 'https://raw.githubusercontent.com/macroBIM/phD/';
+  var ASK  = new URLSearchParams(location.search).get('br');
+  var TRY  = ASK ? [ASK] : ['main', 'claude/macrobim-index-phd-html-2xfw3l'];
+
+  (function next(i) {
+    if (i >= TRY.length) {
+      document.getElementById('phd-root').innerHTML =
+        '<div style="padding:40px;color:#c0362c;font-family:system-ui,sans-serif;">' +
+        '뷰어를 찾지 못했습니다 — 확인한 브랜치: ' + TRY.join(', ') + '</div>';
+      return;
+    }
+    fetch(REPO + TRY[i] + '/phd_viewer.js?v=' + Date.now())
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+      .then(function (code) {
+        window.PHD_BRANCH = TRY[i];                     // 뷰어도 같은 브랜치에서 원고를 읽는다
+        var s = document.createElement('script');
+        s.textContent = code;
+        document.body.appendChild(s);
+      })
+      .catch(function () { next(i + 1); });
+  })(0);
+})();
+</script>
+
+</body>
+</html>
