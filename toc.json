@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "title": "CAF 기반 철근 배근 자동화",
+    "subtitle": "Clash-Avoidance Field 정식화와 비정형 콘크리트 단면으로의 일반화",
+    "author": "macroBIM",
+    "updated": "2026-08-29",
+    "note": "이 문서는 골격(스켈레톤) 단계입니다. 각 절의 본문은 계속 갱신됩니다."
+  },
+  "chapters": [
+    { "file": "ch01_intro.md",       "title": "제1장 서론",              "status": "골격" },
+    { "file": "ch02_related.md",     "title": "제2장 관련연구",          "status": "골격" },
+    { "file": "ch03_caf.md",         "title": "제3장 CAF 이론 정식화",   "status": "골격" },
+    { "file": "ch04_stability.md",   "title": "제4장 수렴성 및 안정성",  "status": "골격" },
+    { "file": "ch05_multibnd.md",    "title": "제5장 Multi-Boundary CAF","status": "골격" },
+    { "file": "ch06_general.md",     "title": "제6장 비정형 단면 일반화","status": "골격" },
+    { "file": "ch07_cases.md",       "title": "제7장 사례연구",          "status": "골격" },
+    { "file": "ch08_compare.md",     "title": "제8장 상용 도구 대비 비교","status": "골격" },
+    { "file": "ch09_conclusion.md",  "title": "제9장 결론 및 향후 연구", "status": "골격" }
+  ]
+}
