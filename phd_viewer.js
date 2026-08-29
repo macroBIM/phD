@@ -1,14 +1,16 @@
 /*
     phd_viewer.js — 논문 뷰어 (macroBIM/phD)
     · 서버의 index_phd.html 은 이 파일 하나만 불러온다. 목차·본문·스타일은 모두 저장소가 갖는다.
-      → 논문을 고치거나 레이아웃을 바꿔도 서버 파일은 그대로 둔다.
+      → 원고를 고치거나 레이아웃을 바꿔도 서버 파일은 그대로 둔다.
     · 읽는 순서: toc.json → 각 장의 .md 를 병렬로 → marked 로 조판 → KaTeX 로 수식.
+    · 화면은 한 번에 한 장(章). 목차에서 장을 고르면 그 장이 열리고, 절을 고르면 그 절로 간다.
+      '전체 보기' 로 아홉 장을 이어서 읽을 수 있고, 인쇄는 언제나 전체를 낸다.
     · 브랜치: ?br=<branch> > window.PHD_BRANCH(부트스트랩이 실제로 찾아낸 것) > main.
       (raw 는 text/plain + nosniff 라 <script src>/<link> 가 막힌다. 그래서 전부 fetch 후 주입한다.)
 */
 (function () {
   var params  = new URLSearchParams(location.search);
-  var BRANCH  = params.get('br') || window.PHD_BRANCH || 'main';   // 부르는 쪽이 정한 브랜치를 따른다
+  var BRANCH  = params.get('br') || window.PHD_BRANCH || 'main';
   var RAW     = 'https://raw.githubusercontent.com/macroBIM/phD/' + BRANCH + '/';
   var BUST    = '?v=' + Date.now();
   var CDN     = 'https://cdnjs.cloudflare.com/ajax/libs/';
@@ -76,6 +78,10 @@
     var se = t.match(/^\s*(\d+)\.(\d+)/);        if (se)  return 'sec-' + se[1] + '-' + se[2];
     return t.trim().replace(/\s+/g, '-');
   }
+  function chapterOf(id) {                       // sec-4-3 → ch-4
+    var m = String(id).match(/^sec-(\d+)-/);
+    return m ? 'ch-' + m[1] : id;
+  }
 
   Promise.all([
     script(CDN + 'marked/12.0.2/marked.min.js'),
@@ -93,19 +99,19 @@
   }).catch(function (e) { fail(e.message); console.error('[phd]', e); });
 
   function render(meta, chapters, bodies) {
-    var box = [];
+    var box  = [];
     var md   = bodies.map(function (b) { return protect(b, box); }).join('\n\n');
     var html = restore(marked.parse(md), box);
 
     var paper = el('div', { class: 'paper' });
-    paper.appendChild(el('header', { class: 'cover' },
+    var cover = el('header', { class: 'cover' },
       '<h1>' + (meta.title || '') + '</h1>' +
       (meta.subtitle ? '<div class="sub">' + meta.subtitle + '</div>' : '') +
       '<div class="by">' + [meta.author, meta.updated ? '최종 수정 ' + meta.updated : '']
         .filter(Boolean).join(' · ') + '</div>' +
-      (meta.note ? '<div class="note">' + meta.note + '</div>' : '')));
+      (meta.note ? '<div class="note">' + meta.note + '</div>' : ''));
     var body = el('div', { class: 'body' }); body.innerHTML = html;
-    paper.appendChild(body);
+    paper.appendChild(cover); paper.appendChild(body);
     doc.innerHTML = ''; doc.appendChild(paper);
 
     if (window.renderMathInElement) {
@@ -120,50 +126,114 @@
       });
     }
 
+    /* ── 장별로 묶는다: h1 이 나올 때마다 새 <section> 을 열고 다음 h1 전까지 담는다 ── */
+    var nodes = Array.prototype.slice.call(body.childNodes), secs = [], cur = null;
+    nodes.forEach(function (n) {
+      if (n.nodeType === 1 && n.tagName === 'H1') {
+        cur = el('section', { class: 'chap' });
+        cur.setAttribute('data-ch', anchorOf(n.textContent));
+        secs.push(cur); body.appendChild(cur);
+      }
+      if (cur) cur.appendChild(n);
+    });
+
     /* ── 목차: 본문 헤딩에서 만든다(장 상태만 toc.json 에서 가져온다) ── */
     var statusOf = {};
     chapters.forEach(function (c) { statusOf[anchorOf(c.title)] = c.status || ''; });
 
-    var nav = el('nav'), heads = body.querySelectorAll('h1, h2'), links = [];
-    Array.prototype.forEach.call(heads, function (h) {
-      var id = anchorOf(h.textContent); h.id = id;
-      var isCh = h.tagName === 'H1';
-      var a = el('a', { href: '#' + id, class: isCh ? 'ch' : 'sec' },
-        '<span>' + h.textContent + '</span>' +
-        (isCh && statusOf[id] ? '<span class="st">' + statusOf[id] + '</span>' : ''));
-      a.onclick = function () { document.body.classList.remove('toc-open'); };
-      nav.appendChild(a); links.push({ a: a, h: h });
+    var nav = el('nav'), links = [];
+    secs.forEach(function (sec) {
+      Array.prototype.forEach.call(sec.querySelectorAll('h1, h2'), function (h) {
+        var id = anchorOf(h.textContent); h.id = id;
+        var isCh = h.tagName === 'H1';
+        var a = el('a', { href: '#' + id, class: isCh ? 'ch' : 'sec' },
+          '<span>' + h.textContent + '</span>' +
+          (isCh && statusOf[id] ? '<span class="st">' + statusOf[id] + '</span>' : ''));
+        nav.appendChild(a); links.push({ a: a, h: h, id: id, sec: sec });
+      });
     });
 
+    /* ── 장 이동 ── */
+    var all = false, active = secs.length ? secs[0].getAttribute('data-ch') : null;
+
+    function show(id, scrollTo) {
+      var chId = chapterOf(id);
+      if (secs.some(function (s) { return s.getAttribute('data-ch') === chId; })) active = chId;
+      secs.forEach(function (s) { s.hidden = !all && s.getAttribute('data-ch') !== active; });
+      cover.hidden = !all && !!active && active !== secs[0].getAttribute('data-ch') ? true : false;
+      document.body.classList.remove('toc-open');
+      var t = scrollTo && document.getElementById(scrollTo);
+      if (t && !t.closest('.chap[hidden]')) t.scrollIntoView({ block: 'start' });
+      else window.scrollTo(0, 0);
+      spy();
+    }
+
+    nav.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('a'); if (!a) return;
+      e.preventDefault();
+      var id = a.getAttribute('href').slice(1);
+      if (history.replaceState) history.replaceState(null, '', '#' + id); else location.hash = id;
+      show(id, id);
+    });
+    window.addEventListener('hashchange', function () {
+      var id = location.hash.slice(1); if (id) show(id, id);
+    });
+
+    /* ── 장 끝의 이전/다음 ── */
+    secs.forEach(function (sec, i) {
+      var pager = el('div', { class: 'pager' });
+      function btn(j, label) {
+        if (j < 0 || j >= secs.length) return el('span', {});
+        var id = secs[j].getAttribute('data-ch');
+        var t  = secs[j].querySelector('h1').textContent;
+        var b  = el('button', { type: 'button' }, label + ' ' + t);
+        b.onclick = function () {
+          if (history.replaceState) history.replaceState(null, '', '#' + id);
+          show(id, null);
+        };
+        return b;
+      }
+      pager.appendChild(btn(i - 1, '←')); pager.appendChild(btn(i + 1, '→'));
+      sec.appendChild(pager);
+    });
+
+    /* ── 사이드바 머리·발 ── */
     toc.innerHTML = '';
     toc.appendChild(el('div', { class: 'toc-head' },
       '<div class="toc-title">' + (meta.title || '논문') + '</div>' +
-      '<div class="toc-sub">목차</div>' +
+      '<div class="toc-sub">' + (meta.subtitle || '목차') + '</div>' +
       '<div class="toc-meta"><span class="pill">' + chapters.length + '개 장</span>' +
       (meta.updated ? '<span class="pill">' + meta.updated + '</span>' : '') +
       (BRANCH !== 'main' ? '<span class="pill branch">br: ' + BRANCH + '</span>' : '') + '</div>'));
     toc.appendChild(nav);
     var foot = el('div', { class: 'toc-foot' });
-    var pr = el('button', { type: 'button' }, '인쇄 / PDF'); pr.onclick = function () { window.print(); };
-    var rl = el('button', { type: 'button', class: 'ghost' }, '새로고침');
-    rl.onclick = function () { location.reload(); };
-    foot.appendChild(pr); foot.appendChild(rl); toc.appendChild(foot);
+    var bAll = el('button', { type: 'button', class: 'ghost' }, '전체 보기');
+    bAll.onclick = function () {
+      all = !all; bAll.textContent = all ? '한 장씩 보기' : '전체 보기';
+      bAll.classList.toggle('on', all);
+      show(active, all ? null : active);
+    };
+    var bPrint = el('button', { type: 'button' }, '인쇄 / PDF');
+    bPrint.onclick = function () { window.print(); };
+    foot.appendChild(bAll); foot.appendChild(bPrint); toc.appendChild(foot);
 
-    /* ── 스크롤에 따라 현재 절 표시 ── */
+    /* ── 스크롤에 따라 현재 절 표시(보이는 장 안에서만) ── */
     var ticking = false;
     function spy() {
-      var cur = links[0], y = window.scrollY + 90;
-      links.forEach(function (l) { if (l.h.offsetTop <= y) cur = l; });
-      links.forEach(function (l) { l.a.classList.toggle('active', l === cur); });
-      if (cur && cur.a.offsetTop < nav.scrollTop) nav.scrollTop = cur.a.offsetTop - 40;
-      else if (cur && cur.a.offsetTop > nav.scrollTop + nav.clientHeight - 60)
-        nav.scrollTop = cur.a.offsetTop - nav.clientHeight + 80;
+      var vis = links.filter(function (l) { return !l.sec.hidden; });
+      if (!vis.length) { ticking = false; return; }
+      var cur2 = vis[0], y = window.scrollY + 90;
+      vis.forEach(function (l) { if (l.h.getBoundingClientRect().top + window.scrollY <= y) cur2 = l; });
+      links.forEach(function (l) { l.a.classList.toggle('active', l === cur2); });
+      if (cur2.a.offsetTop < nav.scrollTop) nav.scrollTop = cur2.a.offsetTop - 40;
+      else if (cur2.a.offsetTop > nav.scrollTop + nav.clientHeight - 60)
+        nav.scrollTop = cur2.a.offsetTop - nav.clientHeight + 80;
       ticking = false;
     }
     window.addEventListener('scroll', function () {
       if (!ticking) { ticking = true; requestAnimationFrame(spy); }
     });
-    spy();
-    if (location.hash) { var t = document.getElementById(location.hash.slice(1)); if (t) t.scrollIntoView(); }
+
+    show(location.hash.slice(1) || active, location.hash.slice(1) || null);
   }
 })();

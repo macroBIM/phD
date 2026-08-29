@@ -1,20 +1,56 @@
 {
   "meta": {
-    "title": "CAF 기반 철근 배근 자동화",
-    "subtitle": "Clash-Avoidance Field 정식화와 비정형 콘크리트 단면으로의 일반화",
+    "title": "콘크리트 피복경계 기반 상태의존적 곡선 유인장을 이용한 철근 자동배치 이론",
+    "subtitle": "Cover-Attractive Field 의 정식화, 안정성 증명 및 검증",
     "author": "macroBIM",
     "updated": "2026-08-29",
-    "note": "이 문서는 골격(스켈레톤) 단계입니다. 각 절의 본문은 계속 갱신됩니다."
+    "note": "Path 3-Lightweight — 이론 정식화 + 구현 문서 + 3개 사례연구 검증. 사례연구는 기여가 아니라 이론 증명의 검증 수단이며, 논문의 무게중심은 H1·H2'·H3·H6의 실제 증명이다."
   },
   "chapters": [
-    { "file": "ch01_intro.md",       "title": "제1장 서론",              "status": "골격" },
-    { "file": "ch02_related.md",     "title": "제2장 관련연구",          "status": "골격" },
-    { "file": "ch03_caf.md",         "title": "제3장 CAF 이론 정식화",   "status": "골격" },
-    { "file": "ch04_stability.md",   "title": "제4장 수렴성 및 안정성",  "status": "골격" },
-    { "file": "ch05_multibnd.md",    "title": "제5장 Multi-Boundary CAF","status": "골격" },
-    { "file": "ch06_general.md",     "title": "제6장 비정형 단면 일반화","status": "골격" },
-    { "file": "ch07_cases.md",       "title": "제7장 사례연구",          "status": "골격" },
-    { "file": "ch08_compare.md",     "title": "제8장 상용 도구 대비 비교","status": "골격" },
-    { "file": "ch09_conclusion.md",  "title": "제9장 결론 및 향후 연구", "status": "골격" }
+    {
+      "file": "ch01_intro.md",
+      "title": "제1장 서론",
+      "status": "초안"
+    },
+    {
+      "file": "ch02_related.md",
+      "title": "제2장 관련연구",
+      "status": "초안"
+    },
+    {
+      "file": "ch03_caf.md",
+      "title": "제3장 Cover-Attractive Field 이론 정식화",
+      "status": "핵심"
+    },
+    {
+      "file": "ch04_stability.md",
+      "title": "제4장 수렴성 및 안정성",
+      "status": "핵심"
+    },
+    {
+      "file": "ch05_multibnd.md",
+      "title": "제5장 다중경계 Cover-Attractive Field",
+      "status": "정식화"
+    },
+    {
+      "file": "ch06_general.md",
+      "title": "제6장 비정형 단면 일반화",
+      "status": "리스크"
+    },
+    {
+      "file": "ch07_cases.md",
+      "title": "제7장 사례연구",
+      "status": "자료수집"
+    },
+    {
+      "file": "ch08_compare.md",
+      "title": "제8장 상용 도구 대비 비교",
+      "status": "미확정"
+    },
+    {
+      "file": "ch09_conclusion.md",
+      "title": "제9장 결론 및 향후 연구",
+      "status": "초안"
+    }
   ]
 }
