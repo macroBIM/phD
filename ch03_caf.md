@@ -80,7 +80,36 @@ $$r_n = \tau(\mathbf{x}_n, \mathbf{n}) - \frac{\delta}{\cos}$$
 | ③ 속도 | $v_{n+1} = D\,(v_n + K\,r_n)$ | $K=$ `GRAVITY_K`, $D=$ `DAMPING` |
 | ④ 위치 | $\mathbf{x}_{n+1} = \mathbf{x}_n + v_{n+1}\,\mathbf{d}$ | 광선 방향으로만 움직인다 |
 | ⑤ 남은 거리 | $r_{n+1} = r_n - v_{n+1}$ | 아래 보조정리 |
-| ⑥ 정지 | $\lvert v_{n+1}\rvert < \varepsilon$ 이고 $\lvert r_{n+1}\rvert < \varepsilon$ | $\varepsilon =$ `CONVERGE` |
+| ⑥ 정지 | 아래 세 조건이 동시에 | 세그먼트 단위로 판정 |
+
+**초기조건은 $v_0 = 0$ 이다.** 속도를 따로 산정하지 않고 정지 상태에서 출발하며, 힘이 매 스텝
+속도에 누적된다(`trebar.js:26`, `lrebar.js:69` 의 `vx:0, vy:0`). 따라서 첫 스텝의 속도는
+
+$$v_1 = D\,(0 + K\,r_0) = DK\,r_0$$
+
+으로 자동으로 정해진다($D K = 0.064$ 이므로 $r_0 = 100$ mm 면 $6.4$ mm/step).
+
+**질량과 시간 눈금이 없다.** 구현은 힘을 그대로 속도에 더한다(`physics.js:279`–`286`). 즉 질량
+$m=1$, 스텝 $\Delta t = 1$ 로 두고 $K = k\,\Delta t / m$ 가 셋을 함께 흡수한다. $K$ 를 강성으로도,
+스텝 크기로도 읽을 수 있는 이유이며, 4.1 의 안정조건이 무차원인 이유이기도 하다.
+
+**속도는 누적된다.** 관성 항 때문에 최대 속도는 첫 스텝의 몇 배가 된다 — 위 값에서는
+$n=5$ 에서 $15.93$ mm/step 으로 첫 스텝의 2.5배다. 4.1 의 오버슈트는 여기서 온다.
+
+### 정지 조건 (⑥의 실제 형태)
+
+구현은 세그먼트 단위로 세 조건을 함께 본다(`physics.js:291`).
+
+$$\text{(i) 모든 노드가 target 을 가짐} \quad
+\text{(ii)} \sum_{\text{node}} \big(|v_x| + |v_y|\big) < \varepsilon_v \quad
+\text{(iii)} \max_{\text{node}} \lVert T - \mathbf{x} \rVert < \varepsilon_p$$
+
+$\varepsilon_v =$ `CONVERGE` $= 0.2$, $\varepsilon_p = 1.0$ mm 다. 두 가지를 짚어야 한다.
+
+- (ii)는 노드별이 아니라 **세그먼트 합**이고 $L^1$ 이다. `NODE_POS` 가 노드 2개를 두므로
+  실효 임계는 노드·축당 $0.05$ mm 수준이며, 노드 수를 바꾸면 임계가 함께 변한다.
+- $\varepsilon_p = 1.0$ mm 는 `CONFIG` 가 아니라 **코드에 직접 박힌 값**이다. 4.1 에서
+  `CONVERGE` 와 함께 정당화해야 할 두 번째 허용오차다.
 
 **보조정리 3.1 (⑤의 근거).** 같은 조각 $\gamma^{*}$ 위에 머무는 동안 광선은 같은 직선이므로
 $\tau(\mathbf{x}+v\,\mathbf{d}) = \tau(\mathbf{x}) - v$ 이고, $\delta/\cos$ 는 그 구간에서 상수다.
