@@ -2,12 +2,18 @@
 
 ## 5.1 H6 — 다중경계 이산할당 정식화
 
-**H6.** 덕트·개구부·기배근·거푸집을 추가 경계로 편입해 유효 attractor 를 경계들의 합집합으로 둔다.
+**H6.** 덕트·개구부·기배근·거푸집을 추가 경계로 편입한다. 정의 3.1의 피복선을 이들까지 포함해
+확장하는 것으로 충분하다.
 
-$$\Gamma_{\text{eff}} = \Gamma_{\text{outer}} \cup \Gamma_{\text{duct},1} \cup \Gamma_{\text{duct},2} \cup \cdots$$
+$$\Gamma_{\text{cover}} = \Gamma_{\text{outer}} \cup \Gamma_{\text{duct},1} \cup \Gamma_{\text{duct},2} \cup \cdots$$
 
-이때 각 세그먼트를 어느 경계 조각에 배정할지가 문제가 되며, 이를 **선형합 할당 문제(LSAP,
-Linear Sum Assignment Problem)** 또는 **최소비용흐름(Min-Cost Flow)** 으로 정식화한다.
+각 덕트·개구부도 자기 경계와 자기 피복을 가지므로 정의 3.1이 그대로 적용된다.
+그러면 3.2의 방향 필터 $A(\mathbf{n})$ 이 후보를 좁히고, 광선 투사가 그중 하나를 고른다.
+
+문제는 **광선 투사가 세그먼트 하나씩 독립으로 고른다**는 데 있다. 세그먼트 여럿이 같은 조각에
+몰리거나, 인접 세그먼트가 서로 다른 경계에 붙어 배근이 갈라질 수 있다. 그래서 배정을 전역
+문제로 다시 세운다 — **선형합 할당 문제(LSAP, Linear Sum Assignment Problem)** 또는
+**최소비용흐름(Min-Cost Flow)**.
 
 $$\min_{X} \sum_{i}\sum_{j} C_{ij}\, x_{ij}, \qquad
 \sum_{j} x_{ij} = 1,\quad x_{ij} \in \{0,1\}$$
