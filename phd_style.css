@@ -90,6 +90,10 @@ body{
 #phd-doc th{background:#f2f4f7; font-weight:700;}
 #phd-doc .katex-display{margin:20px 0; overflow-x:auto; overflow-y:hidden; padding:4px 0;}
 #phd-doc .boot{color:var(--muted); padding:60px 0; text-align:center;}
+#phd-doc .warn{
+  background:#fff4e5; border:1px solid #f0d5ae; color:#8a5a00;
+  border-radius:8px; padding:12px 16px; font-size:13.5px; margin-bottom:24px; line-height:1.7;
+}
 #phd-doc .err{color:#c0362c; background:#fdecea; border:1px solid #f5c6c2; border-radius:8px; padding:16px;}
 
 /* ── 장 단위 보기 ── */

@@ -37,10 +37,47 @@
       head(s);
     });
   }
+  function cssOnce(href) {                    // 스타일시트는 404·차단 시 onerror 가 뜬다
+    return new Promise(function (res, rej) {
+      var l = el('link', { rel: 'stylesheet', href: href });
+      l.onload = res; l.onerror = function () { rej(new Error('css fail: ' + href)); };
+      head(l);
+    });
+  }
+  function first(urls, load) {                // 앞의 것이 실패하면 다음 것으로
+    return urls.reduce(function (p, u) {
+      return p.catch(function () { return load(u); });
+    }, Promise.reject(new Error('empty')));
+  }
 
-  /* ── 바깥 자원: 폰트, KaTeX(CSS+JS), marked ── */
+  /* ── 바깥 자원 ─────────────────────────────────────────────────────────
+     한 CDN 이 막힌 망(사내망·학교망·차단 확장)에서도 수식이 살아 있도록
+     jsdelivr → cdnjs 순으로 시도한다. 경로 규칙이 서로 다르므로 둘 다 적는다. */
+  var LIB = {
+    marked: ['https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js',
+             CDN + 'marked/12.0.2/marked.min.js'],
+    katex:  ['https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js',
+             CDN + 'KaTeX/0.16.9/katex.min.js'],
+    auto:   ['https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js',
+             CDN + 'KaTeX/0.16.9/contrib/auto-render.min.js'],
+    css:    ['https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css',
+             CDN + 'KaTeX/0.16.9/katex.min.css']
+  };
+  var mathNote = null, mdNote = null;         // 자원이 안 붙었을 때 화면에 띄울 사유
+
+  //  marked 가 없으면 제목만이라도 살려 조판한다 — 목차와 장 넘김이 계속 동작하도록.
+  function toHtml(md) {
+    if (window.marked) return marked.parse(md);
+    return md.split('\n').map(function (l) {
+      var e = l.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      var m;
+      if ((m = e.match(/^###\s+(.*)/)))  return '<h3>' + m[1] + '</h3>';
+      if ((m = e.match(/^##\s+(.*)/)))   return '<h2>' + m[1] + '</h2>';
+      if ((m = e.match(/^#\s+(.*)/)))    return '<h1>' + m[1] + '</h1>';
+      return e.trim() ? '<p>' + e + '</p>' : '';
+    }).join('\n');
+  }
   css('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
-  css(CDN + 'KaTeX/0.16.9/katex.min.css');
 
   /* ── 뼈대 DOM ── */
   //  부르는 쪽(index_phd.html)이 로딩 문구에 준 인라인 스타일이 본문으로 새지 않게 지운다.
@@ -83,11 +120,16 @@
     return m ? 'ch-' + m[1] : id;
   }
 
+  //  수식 자원이 다 실패해도 본문은 나와야 한다 — 사유만 적어두고 계속 간다.
+  var mathReady = Promise.all([
+    first(LIB.css, cssOnce).catch(function () { mathNote = 'KaTeX 스타일시트'; }),
+    first(LIB.katex, script).then(function () { return first(LIB.auto, script); })
+      .catch(function () { mathNote = 'KaTeX 스크립트'; })
+  ]);
+
   Promise.all([
-    script(CDN + 'marked/12.0.2/marked.min.js'),
-    script(CDN + 'KaTeX/0.16.9/katex.min.js').then(function () {
-      return script(CDN + 'KaTeX/0.16.9/contrib/auto-render.min.js');
-    }),
+    first(LIB.marked, script).catch(function () { mdNote = 'marked(마크다운 조판기)'; }),
+    mathReady,
     text(RAW + 'phd_style.css' + BUST).then(function (c) { head(el('style', {}, c)); })
       .catch(function (e) { console.error('[phd] style:', e); }),
     text(RAW + 'toc.json' + BUST).then(JSON.parse)
@@ -101,7 +143,7 @@
   function render(meta, chapters, bodies) {
     var box  = [];
     var md   = bodies.map(function (b) { return protect(b, box); }).join('\n\n');
-    var html = restore(marked.parse(md), box);
+    var html = restore(toHtml(md), box);
 
     var paper = el('div', { class: 'paper' });
     var cover = el('header', { class: 'cover' },
@@ -114,6 +156,7 @@
     paper.appendChild(cover); paper.appendChild(body);
     doc.innerHTML = ''; doc.appendChild(paper);
 
+    if (!window.renderMathInElement) mathNote = mathNote || 'KaTeX 스크립트';
     if (window.renderMathInElement) {
       renderMathInElement(body, {
         delimiters: [
@@ -124,6 +167,22 @@
         ],
         throwOnError: false
       });
+    }
+
+    /* ── 수식이 실제로 조판됐는지 확인 ──
+       스크립트만 붙고 CSS 가 빠지면 KaTeX 는 HTML·MathML 두 층을 겹쳐 그려서
+       글자가 깨진 것처럼 보인다. 폰트가 KaTeX 것인지로 그 상태를 잡아낸다. */
+    var probe = body.querySelector('.katex .mord, .katex');
+    if (probe && !/katex/i.test(getComputedStyle(probe).fontFamily || '')) mathNote = 'KaTeX 스타일시트';
+    if (mathNote || mdNote) {
+      var 증상 = mathNote === 'KaTeX 스타일시트'
+        ? '수식이 글자가 겹친 모양으로 깨져 보입니다'          // 스크립트만 붙어 두 층이 겹친 상태
+        : '수식이 $…$ 원문 그대로 보입니다';
+      paper.insertBefore(el('div', { class: 'warn' },
+        '<b>' + [mdNote, mathNote].filter(Boolean).join(', ') + '</b> 를 불러오지 못해 ' + 증상 + '. ' +
+        (mdNote ? '표와 강조도 빠지고 제목·문단만 보입니다. ' : '') +
+        '망에서 cdn.jsdelivr.net · cdnjs.cloudflare.com 이 막혀 있는지 확인해 주세요. ' +
+        '본문 내용 자체는 모두 읽으실 수 있습니다.'), paper.firstChild);
     }
 
     /* ── 장별로 묶는다: h1 이 나올 때마다 새 <section> 을 열고 다음 h1 전까지 담는다 ── */
