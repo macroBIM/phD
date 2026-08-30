@@ -3,27 +3,32 @@
 ## 3.1 포텐셜 함수 정의
 
 Cover-Attractive Field(이하 CAF)의 인력항은 **피복선까지의 방향성 광선거리**로 정의한다.
-아래 정의는 구현(`macroBIM/macroBIM`, `physics.js:155` `getGravityTarget`)과 1:1로 대응한다.
+아래 정의는 구현(`macroBIM/macroBIM`, `physics.js:155` `getGravityTarget`)과 대응하되,
+장(field) 자체는 배치되는 철근과 무관하게 단면만으로 정의한다.
 
 ### 기호
 
-| 기호 | 뜻 |
-|---|---|
-| $\Omega \subset \mathbb{R}^2$ | 단면 영역 |
-| $w$, $\mathbf{n}_w$, $c_w$ | 콘크리트 벽 선분, 그 안쪽 법선, 그 벽의 피복두께 |
-| $\phi$, $S$ | 현재 철근 지름, 기배근 스택(`wallStack`) |
-| $\mathbf{x}$, $\mathbf{n}$ | 철근 노드 위치, 그 세그먼트의 법선 방향 |
+| 기호 | 뜻 | 누구의 것인가 |
+|---|---|---|
+| $\Omega \subset \mathbb{R}^2$ | 단면 영역 | 부재 |
+| $w$, $\mathbf{n}_w$, $c_w$ | 콘크리트 벽 선분, 그 안쪽 법선, 그 벽의 피복두께 | 부재 |
+| $\mathbf{x}$, $\mathbf{n}$ | 철근 노드 위치, 그 세그먼트의 법선 방향 | 상태 |
+| $\phi$ | 철근 지름 | **철근 개별 입력** |
+| $s$ | 그 지점의 기배근 적층 두께(`wallStack`) | 위치별 |
 
 **상태는 위치만이 아니라 위치와 방향의 쌍** $(\mathbf{x}, \mathbf{n}) \in \Omega \times S^1$ 이다.
 이것이 뒤의 모든 정의를 지배한다.
 
+**장과 철근을 가른다.** $\Gamma_{\text{cover}}$, 허용 경계 $A(\mathbf{n})$, 광선거리 $\tau$ 는
+단면 형상과 피복만으로 정해지는 **부재 고유의 대상**이며 $\phi$ 를 포함하지 않는다. 지름은
+배치되는 철근 하나하나의 입력값이므로, 정의 3.4의 **목표점 후퇴량에만** 들어온다.
+
 ### 정의 3.1 (피복선 $\Gamma_{\text{cover}}$)
 
-각 벽 $w$ 를 $\mathbf{n}_w$ 방향으로 $c_w + \phi/2$ 만큼 평행이동한 뒤, 이웃한 이동선끼리의 직선
-교점으로 양 끝을 다시 잡은 선분들의 집합을 $\Gamma_{\text{cover}}(\phi)$ 라 한다. 각 조각은
-**원본 벽의 법선 $\mathbf{n}_w$ 를 그대로 물려받는다**.
-(`buildCoverWalls:128` → `trimShiftedLoop:75`. 코너를 교점으로 다시 잡는 이 처리가 2.3절의
-offset self-intersection 을 대신한다.)
+각 벽 $w$ 를 $\mathbf{n}_w$ 방향으로 $c_w$ 만큼 평행이동한 뒤, 이웃한 이동선끼리의 직선 교점으로
+양 끝을 다시 잡은 선분들의 집합을 $\Gamma_{\text{cover}}$ 라 한다. 각 조각은 **원본 벽의 법선
+$\mathbf{n}_w$ 를 그대로 물려받는다**. 코너를 교점으로 다시 잡는 이 처리가 2.3절의
+offset self-intersection 을 대신한다.
 
 ### 정의 3.2 (허용 경계 $A(\mathbf{n})$)
 
@@ -31,7 +36,8 @@ $$A(\mathbf{n}) = \{\, \gamma \in \Gamma_{\text{cover}} \;:\; \mathbf{n}_\gamma 
 \qquad \alpha_{\text{th}} = -0.6$$
 
 **$A$ 는 $\mathbf{x}$ 에 의존하지 않고 $\mathbf{n}$ 에만 의존한다**(`physics.js:165`).
-세그먼트 방향이 이완 중 고정이면 $A$ 는 상수집합이다.
+세그먼트 방향이 이완 중 고정이면 $A$ 는 상수집합이다. 지름과도 무관하다 — 지름은 목표를
+얼마나 앞에 둘지를 바꿀 뿐, 어느 조각이 후보인지는 바꾸지 않는다.
 
 ### 정의 3.3 (광선거리 $\tau$ 와 진행방향 $\mathbf{d}$)
 
@@ -45,14 +51,31 @@ $$\Gamma_{\text{eff}}(\mathbf{x},\mathbf{n}) := \gamma^{*}(\mathbf{x},\mathbf{n}
 
 ### 정의 3.4 (목표점 $T$ 와 인력 포텐셜)
 
-교점 $\mathbf{p} = \mathbf{x} + \tau\,\mathbf{d}$ 에서의 적층 두께를 $s = \text{stackAt}(\gamma^{*},\mathbf{p})$,
-$\cos = \mathbf{d}\cdot\mathbf{n}_{\gamma^{*}}$ 라 할 때
+철근의 표면이 피복을 확보하려면 중심은 피복선에서 반지름만큼, 이미 놓인 철근이 있으면 그
+적층만큼 더 물러나야 한다. 두 후퇴는 모두 **경로(광선) 위에서** 환산한다.
 
-$$T(\mathbf{x},\mathbf{n}) = \mathbf{x} + \Big(\tau - \frac{s}{\cos}\Big)\mathbf{d}
-\qquad (|\cos| \le 0.2 \text{ 이면 } T = \mathbf{p} + s\,\mathbf{n}_{\gamma^{*}})$$
+$$\delta = \frac{\phi}{2} + s,
+\qquad \cos = \mathbf{d}\cdot\mathbf{n}_{\gamma^{*}},
+\qquad T(\mathbf{x},\mathbf{n}) = \mathbf{x} + \Big(\tau - \frac{\delta}{\cos}\Big)\mathbf{d}$$
 
-$$U_{\text{attr}}(\mathbf{x},\mathbf{n}) = \tfrac{1}{2} k \lVert \mathbf{x} - T \rVert^{2}
- = \tfrac{1}{2} k \Big(\tau - \frac{s}{\cos}\Big)^{2}$$
+$$U_{\text{attr}} = \tfrac{1}{2} k \lVert \mathbf{x} - T \rVert^{2}
+ = \tfrac{1}{2} k \Big(\tau - \frac{\delta}{\cos}\Big)^{2}$$
+
+($|\cos| \le 0.2$ 이면 구현은 법선 방향 후퇴로 폴백한다 — `physics.js:213`.)
+
+**지름은 여기 $\delta$ 한 곳에만 나타난다.** 장의 정의(3.1–3.3)는 철근이 무엇이든 그대로이며,
+한 번 만든 $\Gamma_{\text{cover}}$ 를 모든 철근이 공유한다.
+
+### 구현 노트 — 코드는 $\phi/2$ 를 오프셋 단계에서 함께 넣는다
+
+`buildCoverWalls(walls, wallStack, currentDia)` 는 벽을 $c_w + \phi/2$ 만큼 한 번에 이동시킨다.
+직선 조각에서는 위 정의와 **정확히 같다** — 조각을 법선으로 $\delta$ 만큼 밀면 광선거리가
+$\delta/\cos$ 만큼 변하기 때문이며, 수치로 확인했다(오차 $10^{-15}$).
+
+차이는 **코너의 미터점에서만** 난다. $90^\circ$ 코너에서 $c_w+\phi/2$ 로 부풀려 잡은 꼭짓점은
+$c_w$ 로 잡은 꼭짓점보다 각 축으로 $\phi/2$ 만큼(D25 면 12.5 mm, D51 이면 25.5 mm) 안쪽에 있다.
+그 점이 **두 벽 모두에 대해 피복을 만족하는 중심 위치**이므로 코너에서는 구현 쪽이 옳다.
+따라서 본문은 장을 $\phi$ 없이 정의하고, 코너에서의 이 보정을 구현 세부로 남긴다.
 
 ### 주의 — 최근접거리가 아니다
 
@@ -97,7 +120,7 @@ $\alpha_{\text{th}} = -0.6$ 은 $\theta \ge \arccos(-0.6) \approx 126.87^\circ$,
 ## 3.3 H3 — 기존 APF는 CAF의 특수 사례
 
 **H3.** $A(\mathbf{n})$ 이 방향과 무관한 한 점 $\mathbf{x}_0$ 로 퇴화하면 CAF 의 인력항은 고전 APF 의
-인력항으로 환원된다. 이때 $\tau\,\mathbf{d} = \mathbf{x}_0 - \mathbf{x}$, $s=0$ 이므로
+인력항으로 환원된다. 이때 $\tau\,\mathbf{d} = \mathbf{x}_0 - \mathbf{x}$, $\delta=0$ 이므로
 
 $$U_{\text{attr}} = \tfrac12 k \lVert \mathbf{x} - \mathbf{x}_0 \rVert^{2}$$
 
