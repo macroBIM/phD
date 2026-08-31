@@ -1,0 +1,5 @@
+id,authors,year,title,venue,doi,domain,member,output,mechanism,justification,clash,dim,obstacles,validation,n_cases,claim,limitation,relevance,gap_note,verified
+liu2020,Liu et al.,2020,(제목 확인 필요),,,RC,?,R,FIELD,GEO,NONE,?,none,?,,APF 로 철근 경로를 다룸,목표점을 외부에서 상수로 지정,5,H3 의 직접 비교 대상,no
+xu2022,Xu et al.,2022,(제목 확인 필요),,,RC,?,R,FIELD,GEO,NONE,?,none,?,,APF 기반 배근,목표점 생성 없음,5,H3 의 직접 비교 대상,no
+rimon1992,Rimon & Koditschek,1992,Exact robot navigation using artificial potential functions,IEEE T-RA,,ROBOT,-,R,FIELD,NONE,NONE,2D/3D,generic,theory,,navigation function 의 critical point 구조,배근 도메인 아님,4,4.3 채터링의 이론적 배경,no
+kim1991,Kim & Khosla,1991,(제목 확인 필요),,,ROBOT,-,R,FIELD,NONE,NONE,2D,generic,theory,,조화함수 포텐셜에는 국소최소가 없음,배근 도메인 아님,4,4.3 의 이론적 배경,no

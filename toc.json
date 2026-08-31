@@ -56,6 +56,11 @@
       "file": "appendixA_redesign.md",
       "title": "부록 A. 연구 재설계 검토",
       "status": "제안"
+    },
+    {
+      "file": "appendixB_litprotocol.md",
+      "title": "부록 B. 문헌 조사 프로토콜",
+      "status": "실행대기"
     }
   ]
 }
