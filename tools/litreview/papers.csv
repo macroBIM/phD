@@ -26,3 +26,7 @@ kr_std_auto,(저자 확인 필요),2013,표준화된 철근배근도 작성 자�
 kr_loss_opt,(저자 확인 필요),,철근 손율을 줄이기 위한 최적화 알고리즘 개발에 관한 연구,대한건축학회 논문집,,RC,-,Q,OPT,NONE,NONE,-,none,case,,철근 손율 최소화 조합 최적화,배치가 아니라 물량,2,물량 계열,search
 rimon1992,Rimon & Koditschek,1992,Exact robot navigation using artificial potential functions,IEEE Transactions on Robotics and Automation,,ROBOT,-,R,FIELD,NONE,NONE,2D/3D,generic,theory,,navigation function 의 critical point 구조,배근 도메인 아님,4,4.3 채터링의 이론적 배경,search
 kim1991,Kim & Khosla,1991,(제목 확인 필요),(확인 필요),,ROBOT,-,R,FIELD,NONE,NONE,2D,generic,theory,,조화함수 포텐셜에는 국소최소가 없음,배근 도메인 아님,3,4.3 의 이론적 배경,no
+constr_topopt,(저자 확인 필요),,Optimizing Reinforcement Layout in Concrete Design Considering Constructability,(확인 필요),,RC,member,P,OPT,MECH,CONSTR,2D,none,example,,위상최적화 배근에 시공성을 함께 고려,,5,***마지막 빈 칸을 위협한다 — 전문 확인 최우선***,search
+constr_in_topopt,(저자 확인 필요),,Considering Constructability in Structural Topology Optimization,(확인 필요),,GEN,-,P,OPT,MECH,NONE,2D,none,example,,위상최적화에 시공성 제약 도입,철근 상세 아님,4,같은 위협,search
+detailing_slab,(저자 확인 필요),2016,Optimized Reinforcement Detailing Design for Sustainable Construction: Slab Case Study,(확인 필요),,RC,slab,P,OPT,CODE,NONE,2D,none,case,,배근 상세 최적화(지름·간격·정착),역학 목적함수 아님,3,상세 최적화 계열,search
+kr_deck_slab,(저자 확인 필요),,데크플레이트 슬래브 배근 자동화 (RISS 학위논문),RISS 학위논문,,RC,slab,P,RULE,CODE,NONE,2D,none,case,,방향별 배근·물량을 시공성 고려해 자동화,,3,국내 학위논문 — 상세 확인 필요,search
