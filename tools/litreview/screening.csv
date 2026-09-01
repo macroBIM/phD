@@ -1,1 +1,31 @@
 found_id,source,query,title,year,decision,reason
+s01,Google,automatic rebar layout generation RC BIM algorithm,Development of automatic rebar layout algorithms considering design characteristics of RC members,2025,include,규칙 계열 최신
+s02,Google,automatic rebar layout generation RC BIM algorithm,A BIM-based intelligent approach to rebar layout optimization for RC columns,2024,include,최적화 계열
+s03,Google,automatic rebar layout generation RC BIM algorithm,BIM-BVBS integration with openBIM standards for prefabrication of steel reinforcement,2021,exclude,제작·물류 표준 — 배치 아님
+s04,Google,automatic rebar layout generation RC BIM algorithm,Automatic generation system of rebar shop drawing using 3D model (특허),,exclude,특허 문서
+s05,Google,automatic rebar layout generation RC BIM algorithm,BIM-Based Simulator for Rebar Placement,,exclude,시뮬레이터 도구 — 알고리즘 기여 불명확
+s06,Google,APF rebar reinforcement layout concrete,Intelligent rebar layout in RC building frames using APF,2020,include,H3 직접 비교 대상
+s07,Google,APF rebar reinforcement layout concrete,Automated steel reinforcement detailing using evolutionary optimization and APF,2022,include,장+최적화 결합
+s08,Google,APF rebar reinforcement layout concrete,Study APF on the Clash Free Layout of Rebar in RC Beam-Column Joints,2018,include,APF 초기 연구
+s09,Google,topology optimization strut-and-tie automatic,Topology Optimization of Strut-and-Tie Models Using an Evolutionary Procedure,2000,include,역학 정당화 칸
+s10,Google,topology optimization strut-and-tie automatic,Generating strut-and-tie patterns using topology optimization,2009,include,역학 정당화 칸
+s11,Google,topology optimization strut-and-tie automatic,A critical evaluation of topology optimization results for STM,2020,include,같은 칸 비판적 검토
+s12,Google,topology optimization strut-and-tie automatic,Experimental investigation of strut-and-tie layouts in deep RC beams,2019,exclude,실험 검증 — 배치 생성 방법 아님
+s13,Google,principal stress trajectory reinforcement layout,Stress trajectory-oriented corbel reinforcement,2023,include,역학이 위치를 정하는 선례
+s14,Google,principal stress trajectory reinforcement layout,Strength-based material layout optimization of solid RC,2022,include,연속 재료장 — 양자화 미해결
+s15,Google,principal stress trajectory reinforcement layout,Reinforcement layout design based on continuum damage and truss topology optimization,2013,include,같은 칸
+s16,Google,rebar congestion clash-free GNN,Automatic clash avoidance using explainable GNN and rebar embedding learning,2025,include,proactive 회피 표방
+s17,Google,rebar congestion clash-free GNN,Automated structural design optimization using GNN and exploratory GA,2022,include,학습 계열 대표
+s18,Google,rebar congestion clash-free GNN,Automated clash-free optimization using BIM and two-stage GA,2021,include,최적화+간섭
+s19,Google,rebar congestion clash-free GNN,Automated clash resolution via Q-learning and BIM,2020,include,detect-and-fix baseline 후보
+s20,Google,rebar congestion clash-free GNN,Automated Clash Free Rebar Design in Precast Wall via GAN and MARL,2019,include,학습 계열
+s21,Google,CVT optimal transport point distribution,Centroidal Voronoi tessellations: applications and algorithms,1999,include,A.2 해법 출처
+s22,Google,CVT optimal transport point distribution,Pointwise convergence of the Lloyd algorithm in higher dimension,2014,include,수렴성 근거 후보
+s23,Google,CVT optimal transport point distribution,Higher-dimensional power diagrams for semi-discrete optimal transport,2021,include,측도근사 해법
+s24,Google,CVT optimal transport point distribution,Point cloud resampling using CVT,,exclude,도메인 무관
+s25,Google,3D printed concrete reinforcement path planning,Reinforcement strategies for 3D-concrete-printing,2020,include,인접 분야 개관
+s26,Google,3D printed concrete reinforcement path planning,BIM-enabled robot control system for rebar and 3D concrete printing,2024,include,인접 분야
+s27,Google,3D printed concrete reinforcement path planning,Global continuous path planning for 3DCP multi-branched structure,2023,exclude,프린팅 경로 — 철근 아님
+s28,Google,철근 배근 자동화 알고리즘,벽체 철근배근도 작성 자동화 시스템 개발,2015,include,국내 규칙 계열
+s29,Google,철근 배근 자동화 알고리즘,표준화된 철근배근도 작성 자동화를 위한 필요 사항,2013,include,국내 규칙 계열
+s30,Google,철근 배근 자동화 알고리즘,철근 손율을 줄이기 위한 최적화 알고리즘,,include,물량 계열
