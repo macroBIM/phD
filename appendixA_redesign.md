@@ -1333,3 +1333,361 @@ potential function of obstacles is modified and the repulsive force from obstacl
    도구가 아니다. 그룹 무게중심 반발장과 함께 문제 자체가 사라진다.
 3. **gap 문장을 "없다"에서 "이 조건에서 안 된다"로 바꾼다.** 부록 B 에서 네 칸이 모두 찼으므로
    부재 주장은 불가능하다. 대신 **적용 조건의 차이**로 자리를 만든다 — 이쪽이 훨씬 방어된다.
+
+
+## A.14 파라메트릭 baseline 과의 비교 — 실제로 재봤다
+
+파라메트릭(규칙기반) 배근을 **공정하게** 구현해 비교했다(`tools/parametric.py`,
+`tools/case_compare.py`). 공정성을 위해 파라메트릭에도 **miter-join robust offset** 을 주었다 —
+단순 offset 의 self-intersection 은 여기서 이미 해소되므로, 차이가 offset 품질에서 나오지 않는다.
+
+**과제**: 박스거더 단면, 외곽·중공 피복선을 따라 D25 @200 종방향 철근 배치(293개), 덕트 존재.
+
+### 결과
+
+| | 덕트 깊이 | 배치 | 피복 위반 | 덕트 간섭 | 수작업 개입 |
+|---|---|---|---|---|---|
+| 파라메트릭 | 깊음(실제 배치) | 293 | 0 | **0** | **0회** |
+| 허용영역 기반 | 깊음 | 293 | 0 | 0 | 0회 |
+| 파라메트릭 | **얕음**(얕은 텐던) | 293 | 0 | **4** | **4회** |
+| 허용영역 기반 | 얕음 | 289 | 0 | **0** | 0회 |
+
+간섭 4건의 여유는 −8.6, −9.2, −9.8, −10.4 mm 다. 도면상으로는 철근과 덕트가 떨어져 보이지만
+**피복을 세면 겹친다** — 눈으로 판별되지 않는 크기다.
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="600 -800 2200 900" width="100%">
+<rect x="-99999" y="-99999" width="999999" height="999999" fill="#fff"/>
+<path d="M -3000,0 L 3000,0 L 3000,-600 L 4000,-6200 L 6000,-6200 L 6000,-6600 L -6000,-6600 L -6000,-6200 L -4000,-6200 L -3000,-600 Z" fill="#eceff3" stroke="#334" stroke-width="16"/>
+<path d="M -2500,-600 L 2500,-600 L 3500,-6200 L -3500,-6200 Z" fill="#fff" stroke="#334" stroke-width="16"/>
+<circle cx="3179" cy="-3000" r="50" fill="#d0d5dc" stroke="#8a9098" stroke-width="10"/>
+<circle cx="3179" cy="-3000" r="103" fill="none" stroke="#c9ccd1" stroke-width="6" stroke-dasharray="20,14"/>
+<circle cx="3212" cy="-3190" r="50" fill="#d0d5dc" stroke="#8a9098" stroke-width="10"/>
+<circle cx="3212" cy="-3190" r="103" fill="none" stroke="#c9ccd1" stroke-width="6" stroke-dasharray="20,14"/>
+<circle cx="-3179" cy="-3000" r="50" fill="#d0d5dc" stroke="#8a9098" stroke-width="10"/>
+<circle cx="-3179" cy="-3000" r="103" fill="none" stroke="#c9ccd1" stroke-width="6" stroke-dasharray="20,14"/>
+<circle cx="-3212" cy="-3190" r="50" fill="#d0d5dc" stroke="#8a9098" stroke-width="10"/>
+<circle cx="-3212" cy="-3190" r="103" fill="none" stroke="#c9ccd1" stroke-width="6" stroke-dasharray="20,14"/>
+<circle cx="-1500" cy="-150" r="50" fill="#d0d5dc" stroke="#8a9098" stroke-width="10"/>
+<circle cx="-1500" cy="-150" r="103" fill="none" stroke="#c9ccd1" stroke-width="6" stroke-dasharray="20,14"/>
+<circle cx="-500" cy="-150" r="50" fill="#d0d5dc" stroke="#8a9098" stroke-width="10"/>
+<circle cx="-500" cy="-150" r="103" fill="none" stroke="#c9ccd1" stroke-width="6" stroke-dasharray="20,14"/>
+<circle cx="500" cy="-150" r="50" fill="#d0d5dc" stroke="#8a9098" stroke-width="10"/>
+<circle cx="500" cy="-150" r="103" fill="none" stroke="#c9ccd1" stroke-width="6" stroke-dasharray="20,14"/>
+<circle cx="1500" cy="-150" r="50" fill="#d0d5dc" stroke="#8a9098" stroke-width="10"/>
+<circle cx="1500" cy="-150" r="103" fill="none" stroke="#c9ccd1" stroke-width="6" stroke-dasharray="20,14"/>
+<circle cx="-2937" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="-2737" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="-2537" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="-2336" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="-2136" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="-1936" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="-1735" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="-1335" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="-1134" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="-934" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="-734" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="-333" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="-133" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="68" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="268" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="669" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="869" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="1069" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="1270" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="1670" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="1871" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="2071" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="2271" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="2472" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="2672" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="2872" cy="-63" r="12.7" fill="#1f6feb"/>
+<circle cx="2937" cy="-198" r="12.7" fill="#1f6feb"/>
+<circle cx="2937" cy="-398" r="12.7" fill="#1f6feb"/>
+<circle cx="2937" cy="-599" r="12.7" fill="#1f6feb"/>
+<circle cx="2971" cy="-796" r="12.7" fill="#1f6feb"/>
+<circle cx="3007" cy="-993" r="12.7" fill="#1f6feb"/>
+<circle cx="3042" cy="-1190" r="12.7" fill="#1f6feb"/>
+<circle cx="3077" cy="-1388" r="12.7" fill="#1f6feb"/>
+<circle cx="3112" cy="-1585" r="12.7" fill="#1f6feb"/>
+<circle cx="3147" cy="-1782" r="12.7" fill="#1f6feb"/>
+<circle cx="3183" cy="-1979" r="12.7" fill="#1f6feb"/>
+<circle cx="3218" cy="-2176" r="12.7" fill="#1f6feb"/>
+<circle cx="3253" cy="-2374" r="12.7" fill="#1f6feb"/>
+<circle cx="3288" cy="-2571" r="12.7" fill="#1f6feb"/>
+<circle cx="3323" cy="-2768" r="12.7" fill="#1f6feb"/>
+<circle cx="3359" cy="-2965" r="12.7" fill="#1f6feb"/>
+<circle cx="3394" cy="-3162" r="12.7" fill="#1f6feb"/>
+<circle cx="3429" cy="-3360" r="12.7" fill="#1f6feb"/>
+<circle cx="3464" cy="-3557" r="12.7" fill="#1f6feb"/>
+<circle cx="3500" cy="-3754" r="12.7" fill="#1f6feb"/>
+<circle cx="3535" cy="-3951" r="12.7" fill="#1f6feb"/>
+<circle cx="3570" cy="-4148" r="12.7" fill="#1f6feb"/>
+<circle cx="3605" cy="-4346" r="12.7" fill="#1f6feb"/>
+<circle cx="3640" cy="-4543" r="12.7" fill="#1f6feb"/>
+<circle cx="3676" cy="-4740" r="12.7" fill="#1f6feb"/>
+<circle cx="3711" cy="-4937" r="12.7" fill="#1f6feb"/>
+<circle cx="3746" cy="-5134" r="12.7" fill="#1f6feb"/>
+<circle cx="3781" cy="-5332" r="12.7" fill="#1f6feb"/>
+<circle cx="3816" cy="-5529" r="12.7" fill="#1f6feb"/>
+<circle cx="3852" cy="-5726" r="12.7" fill="#1f6feb"/>
+<circle cx="3887" cy="-5923" r="12.7" fill="#1f6feb"/>
+<circle cx="3922" cy="-6121" r="12.7" fill="#1f6feb"/>
+<circle cx="4003" cy="-6263" r="12.7" fill="#1f6feb"/>
+<circle cx="4204" cy="-6263" r="12.7" fill="#1f6feb"/>
+<circle cx="4404" cy="-6263" r="12.7" fill="#1f6feb"/>
+<circle cx="4604" cy="-6263" r="12.7" fill="#1f6feb"/>
+<circle cx="4805" cy="-6263" r="12.7" fill="#1f6feb"/>
+<circle cx="5005" cy="-6263" r="12.7" fill="#1f6feb"/>
+<circle cx="5205" cy="-6263" r="12.7" fill="#1f6feb"/>
+<circle cx="5406" cy="-6263" r="12.7" fill="#1f6feb"/>
+<circle cx="5606" cy="-6263" r="12.7" fill="#1f6feb"/>
+<circle cx="5806" cy="-6263" r="12.7" fill="#1f6feb"/>
+<circle cx="5937" cy="-6332" r="12.7" fill="#1f6feb"/>
+<circle cx="5937" cy="-6532" r="12.7" fill="#1f6feb"/>
+<circle cx="5742" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="5542" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="5341" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="5141" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="4941" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="4740" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="4540" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="4340" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="4139" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="3939" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="3739" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="3538" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="3338" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="3138" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="2937" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="2737" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="2537" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="2336" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="2136" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="1936" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="1735" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="1535" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="1335" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="1134" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="934" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="734" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="533" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="333" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="133" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-68" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-268" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-468" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-669" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-869" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-1069" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-1270" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-1470" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-1670" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-1871" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-2071" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-2271" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-2472" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-2672" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-2872" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-3073" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-3273" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-3473" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-3674" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-3874" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-4074" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-4274" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-4475" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-4675" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-4875" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-5076" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-5276" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-5476" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-5677" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-5877" cy="-6537" r="12.7" fill="#1f6feb"/>
+<circle cx="-5937" cy="-6397" r="12.7" fill="#1f6feb"/>
+<circle cx="-5871" cy="-6263" r="12.7" fill="#1f6feb"/>
+<circle cx="-5671" cy="-6263" r="12.7" fill="#1f6feb"/>
+<circle cx="-5471" cy="-6263" r="12.7" fill="#1f6feb"/>
+<circle cx="-5270" cy="-6263" r="12.7" fill="#1f6feb"/>
+<circle cx="-5070" cy="-6263" r="12.7" fill="#1f6feb"/>
+<circle cx="-4870" cy="-6263" r="12.7" fill="#1f6feb"/>
+<circle cx="-4669" cy="-6263" r="12.7" fill="#1f6feb"/>
+<circle cx="-4469" cy="-6263" r="12.7" fill="#1f6feb"/>
+<circle cx="-4269" cy="-6263" r="12.7" fill="#1f6feb"/>
+<circle cx="-4068" cy="-6263" r="12.7" fill="#1f6feb"/>
+<circle cx="-3934" cy="-6185" r="12.7" fill="#1f6feb"/>
+<circle cx="-3898" cy="-5987" r="12.7" fill="#1f6feb"/>
+<circle cx="-3863" cy="-5790" r="12.7" fill="#1f6feb"/>
+<circle cx="-3828" cy="-5593" r="12.7" fill="#1f6feb"/>
+<circle cx="-3793" cy="-5396" r="12.7" fill="#1f6feb"/>
+<circle cx="-3757" cy="-5199" r="12.7" fill="#1f6feb"/>
+<circle cx="-3722" cy="-5001" r="12.7" fill="#1f6feb"/>
+<circle cx="-3687" cy="-4804" r="12.7" fill="#1f6feb"/>
+<circle cx="-3652" cy="-4607" r="12.7" fill="#1f6feb"/>
+<circle cx="-3617" cy="-4410" r="12.7" fill="#1f6feb"/>
+<circle cx="-3581" cy="-4213" r="12.7" fill="#1f6feb"/>
+<circle cx="-3546" cy="-4015" r="12.7" fill="#1f6feb"/>
+<circle cx="-3511" cy="-3818" r="12.7" fill="#1f6feb"/>
+<circle cx="-3476" cy="-3621" r="12.7" fill="#1f6feb"/>
+<circle cx="-3441" cy="-3424" r="12.7" fill="#1f6feb"/>
+<circle cx="-3405" cy="-3226" r="12.7" fill="#1f6feb"/>
+<circle cx="-3370" cy="-3029" r="12.7" fill="#1f6feb"/>
+<circle cx="-3335" cy="-2832" r="12.7" fill="#1f6feb"/>
+<circle cx="-3300" cy="-2635" r="12.7" fill="#1f6feb"/>
+<circle cx="-3264" cy="-2438" r="12.7" fill="#1f6feb"/>
+<circle cx="-3229" cy="-2240" r="12.7" fill="#1f6feb"/>
+<circle cx="-3194" cy="-2043" r="12.7" fill="#1f6feb"/>
+<circle cx="-3159" cy="-1846" r="12.7" fill="#1f6feb"/>
+<circle cx="-3124" cy="-1649" r="12.7" fill="#1f6feb"/>
+<circle cx="-3088" cy="-1452" r="12.7" fill="#1f6feb"/>
+<circle cx="-3053" cy="-1254" r="12.7" fill="#1f6feb"/>
+<circle cx="-3018" cy="-1057" r="12.7" fill="#1f6feb"/>
+<circle cx="-2983" cy="-860" r="12.7" fill="#1f6feb"/>
+<circle cx="-2948" cy="-663" r="12.7" fill="#1f6feb"/>
+<circle cx="-2937" cy="-463" r="12.7" fill="#1f6feb"/>
+<circle cx="-2937" cy="-263" r="12.7" fill="#1f6feb"/>
+<circle cx="-2544" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="-2344" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="-2144" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="-1944" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="-1744" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="-1544" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="-1344" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="-1144" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="-944" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="-744" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="-544" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="-344" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="-144" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="56" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="257" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="457" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="657" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="857" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="1057" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="1257" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="1457" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="1657" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="1857" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="2057" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="2257" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="2457" cy="-547" r="12.7" fill="#1f6feb"/>
+<circle cx="2564" cy="-658" r="12.7" fill="#1f6feb"/>
+<circle cx="2599" cy="-855" r="12.7" fill="#1f6feb"/>
+<circle cx="2634" cy="-1052" r="12.7" fill="#1f6feb"/>
+<circle cx="2669" cy="-1249" r="12.7" fill="#1f6feb"/>
+<circle cx="2705" cy="-1446" r="12.7" fill="#1f6feb"/>
+<circle cx="2740" cy="-1643" r="12.7" fill="#1f6feb"/>
+<circle cx="2775" cy="-1840" r="12.7" fill="#1f6feb"/>
+<circle cx="2810" cy="-2037" r="12.7" fill="#1f6feb"/>
+<circle cx="2845" cy="-2234" r="12.7" fill="#1f6feb"/>
+<circle cx="2880" cy="-2431" r="12.7" fill="#1f6feb"/>
+<circle cx="2916" cy="-2628" r="12.7" fill="#1f6feb"/>
+<circle cx="2951" cy="-2825" r="12.7" fill="#1f6feb"/>
+<circle cx="2986" cy="-3022" r="12.7" fill="#1f6feb"/>
+<circle cx="3021" cy="-3219" r="12.7" fill="#1f6feb"/>
+<circle cx="3056" cy="-3416" r="12.7" fill="#1f6feb"/>
+<circle cx="3091" cy="-3612" r="12.7" fill="#1f6feb"/>
+<circle cx="3127" cy="-3809" r="12.7" fill="#1f6feb"/>
+<circle cx="3162" cy="-4006" r="12.7" fill="#1f6feb"/>
+<circle cx="3197" cy="-4203" r="12.7" fill="#1f6feb"/>
+<circle cx="3232" cy="-4400" r="12.7" fill="#1f6feb"/>
+<circle cx="3267" cy="-4597" r="12.7" fill="#1f6feb"/>
+<circle cx="3302" cy="-4794" r="12.7" fill="#1f6feb"/>
+<circle cx="3338" cy="-4991" r="12.7" fill="#1f6feb"/>
+<circle cx="3373" cy="-5188" r="12.7" fill="#1f6feb"/>
+<circle cx="3408" cy="-5385" r="12.7" fill="#1f6feb"/>
+<circle cx="3443" cy="-5582" r="12.7" fill="#1f6feb"/>
+<circle cx="3478" cy="-5779" r="12.7" fill="#1f6feb"/>
+<circle cx="3513" cy="-5976" r="12.7" fill="#1f6feb"/>
+<circle cx="3549" cy="-6173" r="12.7" fill="#1f6feb"/>
+<circle cx="3444" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="3244" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="3044" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="2844" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="2644" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="2444" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="2244" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="2044" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="1844" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="1644" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="1444" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="1244" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="1044" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="844" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="644" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="444" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="244" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="44" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="-156" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="-357" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="-557" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="-757" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="-957" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="-1157" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="-1357" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="-1557" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="-1757" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="-1957" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="-2157" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="-2357" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="-2557" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="-2757" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="-2957" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="-3157" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="-3357" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="-3557" cy="-6253" r="12.7" fill="#1f6feb"/>
+<circle cx="-3529" cy="-6061" r="12.7" fill="#1f6feb"/>
+<circle cx="-3494" cy="-5864" r="12.7" fill="#1f6feb"/>
+<circle cx="-3458" cy="-5667" r="12.7" fill="#1f6feb"/>
+<circle cx="-3423" cy="-5471" r="12.7" fill="#1f6feb"/>
+<circle cx="-3388" cy="-5274" r="12.7" fill="#1f6feb"/>
+<circle cx="-3353" cy="-5077" r="12.7" fill="#1f6feb"/>
+<circle cx="-3318" cy="-4880" r="12.7" fill="#1f6feb"/>
+<circle cx="-3283" cy="-4683" r="12.7" fill="#1f6feb"/>
+<circle cx="-3247" cy="-4486" r="12.7" fill="#1f6feb"/>
+<circle cx="-3212" cy="-4289" r="12.7" fill="#1f6feb"/>
+<circle cx="-3177" cy="-4092" r="12.7" fill="#1f6feb"/>
+<circle cx="-3142" cy="-3895" r="12.7" fill="#1f6feb"/>
+<circle cx="-3107" cy="-3698" r="12.7" fill="#1f6feb"/>
+<circle cx="-3072" cy="-3501" r="12.7" fill="#1f6feb"/>
+<circle cx="-3036" cy="-3304" r="12.7" fill="#1f6feb"/>
+<circle cx="-3001" cy="-3107" r="12.7" fill="#1f6feb"/>
+<circle cx="-2966" cy="-2910" r="12.7" fill="#1f6feb"/>
+<circle cx="-2931" cy="-2714" r="12.7" fill="#1f6feb"/>
+<circle cx="-2896" cy="-2517" r="12.7" fill="#1f6feb"/>
+<circle cx="-2861" cy="-2320" r="12.7" fill="#1f6feb"/>
+<circle cx="-2825" cy="-2123" r="12.7" fill="#1f6feb"/>
+<circle cx="-2790" cy="-1926" r="12.7" fill="#1f6feb"/>
+<circle cx="-2755" cy="-1729" r="12.7" fill="#1f6feb"/>
+<circle cx="-2720" cy="-1532" r="12.7" fill="#1f6feb"/>
+<circle cx="-2685" cy="-1335" r="12.7" fill="#1f6feb"/>
+<circle cx="-2650" cy="-1138" r="12.7" fill="#1f6feb"/>
+<circle cx="-2614" cy="-941" r="12.7" fill="#1f6feb"/>
+<circle cx="-2579" cy="-744" r="12.7" fill="#1f6feb"/>
+<circle cx="-1535" cy="-63" r="20.3" fill="#d93025" stroke="#7d1a12" stroke-width="8"/>
+<circle cx="-533" cy="-63" r="20.3" fill="#d93025" stroke="#7d1a12" stroke-width="8"/>
+<circle cx="468" cy="-63" r="20.3" fill="#d93025" stroke="#7d1a12" stroke-width="8"/>
+<circle cx="1470" cy="-63" r="20.3" fill="#d93025" stroke="#7d1a12" stroke-width="8"/>
+<text x="666" y="-719" font-family="sans-serif" font-size="45" fill="#23272f">bottom slab: shallow tendons, 4 clashes</text></svg>
+
+### 이 결과가 말하는 것
+
+**① 덕트가 깊으면 차이가 없다.** 실제 박스거더 배치에서는 파라메트릭도 위반 0 이다.
+A.9 에서 "일반 단면은 쉽다"고 한 것이 여기서 다시 확인된다. **차이는 방법이 아니라
+간섭체가 배근 경로에 걸치는가에서 온다.**
+
+**② 얕은 텐던에서는 갈린다.** 파라메트릭은 규칙에 덕트가 없으므로 4 건을 그냥 놓는다.
+사람이 도면을 보고 손으로 빼야 하며, 그 4 건은 −10 mm 규모라 육안으로 잡히지 않는다.
+
+**③ 그런데 허용영역 기반의 "위반 0" 은 아직 절반의 답이다.** 위반을 0 으로 만든 방법이
+**그 자리에 안 놓는 것**이었다. 289 개만 놓였으므로 **강재량이 4 개만큼 부족하다.**
+진짜 기여는 "위반을 만들지 않는다"가 아니라 **"위반 없이 소요량을 채운다"** 여야 한다.
+빠진 4 개를 어디에 재배치할 것인가 — 그것이 아직 풀리지 않은 문제이며,
+A.2 의 측도 근사(수요장을 이산 강재로 근사)가 겨냥하는 자리다.
+
+### 논문에 쓸 때의 주의
+
+- 파라메트릭에 robust offset 을 주었음을 **명시**해야 한다. 안 그러면 허수아비 비판을 받는다.
+- 계산시간은 파라메트릭이 빠르다. 그것도 함께 보고한다.
+- "CAF 는 로직 1 개, 파라메트릭은 N 개"는 **배근 로직에 한정**된다.
+  단면 형상 엔진은 CAF 쪽도 7 종이 따로 있다(`bim_box1cell` 등).
